@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from app.database.db import engine
-from app.services.gemini_service import ask_ai
+# from app.services.gemini_service import ask_ai
+
+from app.services.groq_service import ask_ai
 from app.tools.weather_tool import get_weather
 from app.agents.travel_agent import ask_travel_agent
 from app.tools.hotel_tool import search_hotels
@@ -14,8 +16,26 @@ from app.models.trip_model import Trip
 
 from fastapi.middleware.cors import CORSMiddleware
 
+from pydantic import BaseModel
+from app.models.user_model import User
+from app.services.auth_service import hash_password, verify_password, create_access_token
+
+from app.services.auth_service import get_current_user_id
+from fastapi import Depends
+
 
 app = FastAPI()
+
+
+class SignupRequest(BaseModel):
+    name: str
+    email: str
+    password: str
+
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
 
 app.add_middleware(
     CORSMiddleware,
@@ -53,9 +73,21 @@ def weather(city: str):
     return get_weather(city)
 
 @app.get("/agent")
-def ai_agent(message: str):
-    response = ask_travel_agent(message)
-    return {"response": response}
+def agent(
+    message: str,
+    user_id: int = Depends(get_current_user_id)
+):
+    if not user_id:
+        return {
+            "success": False,
+            "message": "Unauthorized"
+        }
+
+    response = ask_travel_agent(message, user_id)
+
+    return {
+        "response": response
+    }
 
 
 @app.get("/hotels")
@@ -69,24 +101,123 @@ def route(origin: str, destination: str, mode: str = "drive"):
 
 
 @app.get("/trips")
-def get_trips():
+def get_trips(user_id: int = Depends(get_current_user_id)):
+    if not user_id:
+        return {"success": False, "message": "Unauthorized"}
 
     db = SessionLocal()
 
-    trips = db.query(Trip).all()
+    try:
+        trips = db.query(Trip).filter(Trip.user_id == user_id).all()
 
-    result = []
+        return [
+            {
+                "id": trip.id,
+                "destination": trip.destination,
+                "days": trip.days,
+                "budget": trip.budget,
+                "estimated_cost": trip.estimated_cost,
+                "hotels": trip.hotels,
+                "selected_hotel": trip.selected_hotel,
+                "status": trip.status
+            }
+            for trip in trips
+        ]
 
-    for trip in trips:
-        result.append({
-            "id": trip.id,
-            "destination": trip.destination,
-            "days": trip.days,
-            "budget": trip.budget,
-            "estimated_cost": trip.estimated_cost,
-            "hotels": trip.hotels
+    finally:
+        db.close()
+
+
+@app.patch("/trips/{trip_id}/confirm")
+def confirm_trip(trip_id: int):
+
+    db = SessionLocal()
+
+    try:
+        trip = db.query(Trip).filter(Trip.id == trip_id).first()
+
+        if not trip:
+            return {
+                "success": False,
+                "message": "Trip not found"
+            }
+
+        trip.status = "confirmed"
+
+        db.commit()
+        db.refresh(trip)
+
+        return {
+            "success": True,
+            "message": "Trip confirmed successfully",
+            "trip_id": trip.id,
+            "status": trip.status
+        }
+
+    finally:
+        db.close()
+
+@app.post("/signup")
+def signup(user: SignupRequest):
+    db = SessionLocal()
+
+    try:
+        existing_user = db.query(User).filter(User.email == user.email).first()
+
+        if existing_user:
+            return {"success": False, "message": "Email already registered"}
+
+        new_user = User(
+            name=user.name,
+            email=user.email,
+            hashed_password=hash_password(user.password)
+        )
+
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+
+        return {
+            "success": True,
+            "message": "User created successfully",
+            "user_id": new_user.id
+        }
+
+    except Exception as e:
+        return {"success": False, "error": str(e)}
+
+    finally:
+        db.close()
+
+
+@app.post("/login")
+def login(user: LoginRequest):
+    db = SessionLocal()
+
+    try:
+        db_user = db.query(User).filter(User.email == user.email).first()
+
+        if not db_user:
+            return {"success": False, "message": "Invalid email or password"}
+
+        if not verify_password(user.password, db_user.hashed_password):
+            return {"success": False, "message": "Invalid email or password"}
+
+        token = create_access_token({
+            "user_id": db_user.id,
+            "email": db_user.email
         })
 
-    db.close()
+        return {
+            "success": True,
+            "access_token": token,
+            "token_type": "bearer",
+            "user": {
+                "id": db_user.id,
+                "name": db_user.name,
+                "email": db_user.email
+            }
+        }
 
-    return result
+    finally:
+        db.close()

@@ -18,3 +18,9 @@ class Trip(Base):
     estimated_cost = Column(Integer)
 
     hotels = Column(String)
+
+    selected_hotel = Column(String)
+
+    status = Column(String, default="draft")
+
+    user_id = Column(Integer)

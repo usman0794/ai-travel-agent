@@ -1,7 +1,10 @@
 import json
 import re
 
-from app.services.gemini_service import ask_ai
+# from app.services.gemini_service import ask_ai
+
+from app.services.groq_service import ask_ai
+
 from app.tools.hotel_tool import search_hotels
 from app.tools.weather_tool import get_weather
 from app.database.db import SessionLocal
@@ -41,7 +44,7 @@ Message:
         }
 
 
-def create_trip_plan(message: str):
+def create_trip_plan(message: str, user_id: int):
     details = extract_trip_details(message)
 
     destination = details.get("destination") or "Kashmir"
@@ -67,9 +70,11 @@ def create_trip_plan(message: str):
             days=days,
             budget=budget,
             estimated_cost=total_estimated_cost,
-            hotels=", ".join(hotel_names)
+            hotels=", ".join(hotel_names),
+            selected_hotel=hotel_names[0] if hotel_names else None,
+            status="draft",
+            user_id=user_id
         )
-
         db.add(trip)
         db.commit()
     finally:

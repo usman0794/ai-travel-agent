@@ -1,7 +1,10 @@
 import json
 import re
 
-from app.services.gemini_service import ask_ai
+# from app.services.gemini_service import ask_ai
+
+from app.services.groq_service import ask_ai
+
 from app.tools.weather_tool import get_weather
 from app.tools.hotel_tool import search_hotels
 from app.tools.trip_planner_tool import create_trip_plan
@@ -37,7 +40,7 @@ Message:
         return None
 
 
-def ask_travel_agent(message: str):
+def ask_travel_agent(message: str, user_id: int):
 
     lower_message = message.lower()
 
@@ -90,8 +93,13 @@ Recommend best hotel options clearly.
         return ask_ai(final_prompt)
 
     # TRIP PLANNER TOOL
-    if "plan" in lower_message or "itinerary" in lower_message:
-
-        return create_trip_plan(message)
+    if (
+        "plan" in lower_message
+        or "itinerary" in lower_message
+        or "trip" in lower_message
+        or "travel" in lower_message
+        or "book" in lower_message
+    ):
+        return create_trip_plan(message, user_id)
 
     return ask_ai(message)
