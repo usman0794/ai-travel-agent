@@ -1,32 +1,23 @@
 from fastapi import FastAPI
 from app.database.db import engine
-# from app.services.gemini_service import ask_ai
-
 from app.services.groq_service import ask_ai
 from app.tools.weather_tool import get_weather
 from app.agents.travel_agent import ask_travel_agent
 from app.tools.hotel_tool import search_hotels
 from app.tools.route_tool import get_route_distance
-
 from app.database.db import engine
 from app.database.base import Base
 from typing import Optional
-
 from app.database.db import SessionLocal
 from app.models.trip_model import Trip
-
 from fastapi.middleware.cors import CORSMiddleware
-
 from pydantic import BaseModel
 from app.models.user_model import User
 from app.services.auth_service import hash_password, verify_password, create_access_token
-
 from app.services.auth_service import get_current_user_id
 from fastapi import Depends
 
-
 app = FastAPI()
-
 
 class SignupRequest(BaseModel):
     name: str
@@ -95,16 +86,13 @@ def agent(
         "response": response
     }
 
-
 @app.get("/hotels")
 def hotels(city: str):
     return search_hotels(city)
 
-
 @app.get("/route")
 def route(origin: str, destination: str, mode: str = "drive"):
     return get_route_distance(origin, destination, mode)
-
 
 @app.get("/trips")
 def get_trips(user_id: int = Depends(get_current_user_id)):
@@ -132,7 +120,6 @@ def get_trips(user_id: int = Depends(get_current_user_id)):
 
     finally:
         db.close()
-
 
 @app.patch("/trips/{trip_id}/confirm")
 def confirm_trip(trip_id: int):
@@ -281,7 +268,6 @@ def signup(user: SignupRequest):
 
     finally:
         db.close()
-
 
 @app.post("/login")
 def login(user: LoginRequest):

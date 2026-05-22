@@ -98,3 +98,22 @@ body {
   background: #1e293b;
   color: white;
 }
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: white;
+  color: #4f46e5;
+  padding: 0.85rem 1.25rem;
+  border-radius: 0.9rem;
+  font-weight: 600;
+  border: 1px solid #c7d2fe;
+}
+
+.dark .btn-secondary {
+  background: #0f172a;
+  color: white;
+  border-color: #334155;
+}
