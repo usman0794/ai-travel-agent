@@ -33,13 +33,24 @@ from fastapi import Header
 from jose import JWTError
 
 
-def get_current_user_id(authorization: str = Header(None)):
-    if not authorization:
+from fastapi import Header
+from jose import JWTError
+
+def get_current_user_id(Authorization: str = Header(None)):
+
+    if not Authorization:
         return None
 
     try:
-        token = authorization.replace("Bearer ", "")
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        token = Authorization.replace("Bearer ", "")
+
+        payload = jwt.decode(
+            token,
+            SECRET_KEY,
+            algorithms=[ALGORITHM]
+        )
+
         return payload.get("user_id")
+
     except JWTError:
         return None
