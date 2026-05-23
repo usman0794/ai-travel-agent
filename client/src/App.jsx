@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { Routes, Route } from "react-router-dom";
+import TripDetails from "./pages/TripDetails";
 
 import Footer from "./components/Footer";
 import Trips from "./components/Trips";
@@ -179,41 +181,58 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f6f8ff] dark:bg-slate-950 text-slate-900 dark:text-white">
-      <Navbar user={user} logout={logout} theme={theme} setTheme={setTheme} />
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <div className="min-h-screen bg-[#f6f8ff] dark:bg-slate-950 text-slate-900 dark:text-white">
+            <Navbar
+              user={user}
+              logout={logout}
+              theme={theme}
+              setTheme={setTheme}
+            />
 
-      <Hero sendMessage={sendMessage} />
+            <Hero sendMessage={sendMessage} />
 
-      <Services sendMessage={sendMessage} />
+            <Services sendMessage={sendMessage} />
 
-      <Planner
-        message={message}
-        setMessage={setMessage}
-        sendMessage={sendMessage}
-        loading={loading}
-        response={response}
+            <Planner
+              message={message}
+              setMessage={setMessage}
+              sendMessage={sendMessage}
+              loading={loading}
+              response={response}
+            />
+
+            <Trips
+              savedTrips={savedTrips}
+              confirmBooking={confirmBooking}
+              cancelBooking={cancelBooking}
+              setEditingTrip={setEditingTrip}
+              setEditForm={setEditForm}
+            />
+
+            <CTA sendMessage={sendMessage} />
+
+            <Footer />
+
+            {editingTrip && (
+              <EditModal
+                editForm={editForm}
+                setEditForm={setEditForm}
+                updateTrip={updateTrip}
+                close={() => setEditingTrip(null)}
+              />
+            )}
+          </div>
+        }
       />
 
-      <Trips
-        savedTrips={savedTrips}
-        confirmBooking={confirmBooking}
-        cancelBooking={cancelBooking}
-        setEditingTrip={setEditingTrip}
-        setEditForm={setEditForm}
+      <Route
+        path="/trips/:id"
+        element={<TripDetails savedTrips={savedTrips} />}
       />
-
-      <CTA sendMessage={sendMessage} />
-
-      <Footer />
-
-      {editingTrip && (
-        <EditModal
-          editForm={editForm}
-          setEditForm={setEditForm}
-          updateTrip={updateTrip}
-          close={() => setEditingTrip(null)}
-        />
-      )}
-    </div>
+    </Routes>
   );
 }

@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Float, Date
 
 from app.database.base import Base
 
@@ -21,6 +21,11 @@ class Trip(Base):
 
     selected_hotel = Column(String)
 
+    start_date = Column(String, nullable=True)
+    end_date = Column(String, nullable=True)
+
     status = Column(String, default="draft")
+
+    itinerary = Column(String, nullable=True)
 
     user_id = Column(Integer)

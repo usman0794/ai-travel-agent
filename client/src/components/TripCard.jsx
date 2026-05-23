@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import { getTripImage } from "../utils/getTripImage";
 
 export default function TripCard({
@@ -7,6 +8,7 @@ export default function TripCard({
   setEditingTrip,
   setEditForm,
 }) {
+  const navigate = useNavigate();
   const imageUrl = getTripImage(trip.destination);
 
   const badge =
@@ -16,8 +18,15 @@ export default function TripCard({
         ? "bg-red-500 text-white"
         : "bg-indigo-500 text-white";
 
+  const openDetails = () => {
+    navigate(`/trips/${trip.id}`);
+  };
+
   return (
-    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 overflow-hidden">
+    <div
+      onClick={openDetails}
+      className="bg-white dark:bg-slate-900 rounded-2xl shadow-lg border border-slate-100 dark:border-slate-800 overflow-hidden cursor-pointer hover:-translate-y-1 hover:shadow-xl transition-all"
+    >
       <div className="relative">
         <img
           src={imageUrl}
@@ -47,18 +56,25 @@ export default function TripCard({
         <p className="text-sm text-slate-500 mb-5">
           Hotel: {trip.selected_hotel || "Not selected"}
         </p>
+        <p className="text-sm text-slate-500 mb-5">
+          {new Date().toLocaleDateString()} • {trip.days} Day Trip
+        </p>
 
         {trip.status === "draft" && (
           <div className="flex gap-3">
             <button
-              onClick={() => confirmBooking(trip.id)}
+              onClick={(e) => {
+                e.stopPropagation();
+                confirmBooking(trip.id);
+              }}
               className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white py-3 rounded-xl font-semibold"
             >
               Confirm
             </button>
 
             <button
-              onClick={() => {
+              onClick={(e) => {
+                e.stopPropagation();
                 setEditingTrip(trip);
                 setEditForm({
                   destination: trip.destination,
@@ -75,8 +91,11 @@ export default function TripCard({
 
         {trip.status === "confirmed" && (
           <button
-            onClick={() => cancelBooking(trip.id)}
-            className="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl font-semibold"
+            onClick={(e) => {
+              e.stopPropagation();
+              cancelBooking(trip.id);
+            }}
+            className="mx-auto block bg-red-500 hover:bg-red-600 text-white px-8 py-3 rounded-xl font-semibold"
           >
             Cancel
           </button>

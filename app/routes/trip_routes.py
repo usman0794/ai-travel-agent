@@ -28,6 +28,8 @@ def get_trips(user_id: int = Depends(get_current_user_id)):
                 "hotels": trip.hotels,
                 "selected_hotel": trip.selected_hotel,
                 "status": trip.status,
+                "start_date": trip.start_date,
+                "end_date": trip.end_date,
             }
             for trip in trips
         ]
