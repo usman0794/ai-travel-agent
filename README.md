@@ -1,53 +1,87 @@
-# AI Travel Agent
+# ✈️ AI Travel Agent
 
-An AI-powered travel planning assistant built with FastAPI, React, Gemini API, PostgreSQL, and external travel APIs.
+An intelligent AI-powered travel planning platform built with modern full-stack technologies, LLM integrations, and production-grade DevOps practices.
 
-## Features
+---
 
-- AI trip planning
-- Weather checking
-- Hotel search
-- Route and distance calculation
-- Trip saving with PostgreSQL
-- React frontend dashboard
+# 🚀 Live Demo
 
-## Tech Stack
+## Backend API
 
-### Backend
+https://ai-travel-backend-latest.onrender.com/
 
-- FastAPI
-- Python
-- Gemini API
-- SQLAlchemy
-- PostgreSQL / Neon
+## API Documentation
 
-### Frontend
+https://ai-travel-backend-latest.onrender.com/docs
+
+---
+
+# 🌟 Features
+
+- 🤖 AI-powered travel assistant
+- 🌍 Trip planning for any city worldwide
+- 🏨 Hotel recommendations
+- 🌦 Weather information
+- 🗺 Route and travel guidance
+- 💬 Conversational AI interface
+- 🔐 JWT Authentication
+- ⚡ FastAPI backend
+- 🎨 Modern React frontend
+- 🐳 Dockerized full-stack architecture
+- 🔄 CI/CD with GitHub Actions
+- ☁️ Cloud deployment with Render & Vercel
+
+---
+
+# 🛠 Tech Stack
+
+## Frontend
 
 - React
 - Vite
 - Tailwind CSS
 - Axios
 
-### APIs
+## Backend
 
-- Gemini API
-- OpenWeather API
-- Geoapify API
+- FastAPI
+- Uvicorn
+- SQLAlchemy
+- Pydantic
 
-## Project Structure
+## AI / LLM
 
-```text
-ai-travel-agent/
+- LangChain
+- OpenAI
+- Google Gemini
+- Groq
+
+## Database
+
+- PostgreSQL
+
+## DevOps & Deployment
+
+- Docker
+- Docker Compose
+- GitHub Actions
+- Docker Hub
+- Render
+- Vercel
+
+---
+
+# 📁 Project Structure
+
+```bash
+AI-TRAVEL-AGENT/
+│
 ├── app/
-│   ├── agents/
-│   ├── database/
-│   ├── models/
-│   ├── services/
-│   ├── tools/
-│   └── main.py
-├── frontend/
-│   └── frontend/
+├── client/
+├── .github/workflows/
+├── Dockerfile
+├── docker-compose.yml
 ├── requirements.txt
-├── .env.example
+├── .dockerignore
 └── README.md
 ```
