@@ -1,19 +1,32 @@
-name: Docker CI
+name: Docker CI/CD
 
 on:
   push:
-    branches: [main]
+    branches:
+      - main
 
 jobs:
-  docker-build:
+  docker:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
       - name: Build backend image
-        run: docker build -t ai-travel-backend .
+        run: docker build -t usman0794/ai-travel-backend .
+
+      - name: Push backend image
+        run: docker push usman0794/ai-travel-backend
 
       - name: Build frontend image
-        run: docker build -t ai-travel-frontend ./client
+        run: docker build -t usman0794/ai-travel-frontend ./client
+
+      - name: Push frontend image
+        run: docker push usman0794/ai-travel-frontend
