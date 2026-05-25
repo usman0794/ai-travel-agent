@@ -67,6 +67,7 @@ def login(user: LoginSchema):
                 "id": db_user.id,
                 "name": db_user.name,
                 "email": db_user.email,
+                "profile_picture": db_user.profile_picture,
             },
         }
 

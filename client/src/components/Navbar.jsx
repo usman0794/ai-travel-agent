@@ -1,9 +1,65 @@
-import { Plane, Moon, Sun, User, LogOut } from "lucide-react";
+import {
+  Plane,
+  Moon,
+  Sun,
+  LogOut,
+  Upload,
+  Pencil,
+  Lock,
+  Bell,
+  UserCircle,
+} from "lucide-react";
 import { useState } from "react";
+import axios from "axios";
 import profileImage from "../assets/profile.png";
 
-export default function Navbar({ user, logout, theme, setTheme }) {
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
+export default function Navbar({ user, setUser, logout, theme, setTheme }) {
   const [openProfile, setOpenProfile] = useState(false);
+  const [uploading, setUploading] = useState(false);
+
+  // Default avatar image
+  const profilePic = user?.profile_picture || profileImage;
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      setUploading(true);
+
+      const token = localStorage.getItem("token");
+
+      const res = await axios.post(
+        `${API_URL}/profile/upload-picture`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
+        },
+      );
+
+      const updatedUser = {
+        ...user,
+        profile_picture: res.data.profile_picture,
+      };
+
+      setUser(updatedUser);
+      localStorage.setItem("user", JSON.stringify(updatedUser));
+    } catch (error) {
+      console.error("Upload error:", error.response?.data || error);
+
+      alert(error.response?.data?.detail || "Profile picture upload failed");
+    } finally {
+      setUploading(false);
+    }
+  };
 
   return (
     <nav className="sticky top-0 z-40 backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800">
@@ -20,7 +76,6 @@ export default function Navbar({ user, logout, theme, setTheme }) {
           <a href="#home">Home</a>
           <a href="#services">Services</a>
           <a href="#trips">My Trips</a>
-          <button onClick={() => setOpenProfile(!openProfile)}>Profile</button>
         </div>
 
         <div className="relative flex items-center gap-4">
@@ -31,9 +86,10 @@ export default function Navbar({ user, logout, theme, setTheme }) {
             {theme === "light" ? <Moon size={18} /> : <Sun size={18} />}
           </button>
 
+          {/* Click profile picture to show all options */}
           <button onClick={() => setOpenProfile(!openProfile)}>
             <img
-              src={profileImage}
+              src={profilePic}
               alt="Profile"
               className="w-10 h-10 rounded-full object-cover border-2 border-white shadow"
             />
@@ -43,7 +99,7 @@ export default function Navbar({ user, logout, theme, setTheme }) {
             <div className="absolute right-0 top-14 w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-xl p-5">
               <div className="flex items-center gap-3 mb-4">
                 <img
-                  src={profileImage}
+                  src={profilePic}
                   alt="Profile"
                   className="w-14 h-14 rounded-full object-cover"
                 />
@@ -52,13 +108,38 @@ export default function Navbar({ user, logout, theme, setTheme }) {
                   <h3 className="font-bold text-slate-900 dark:text-white">
                     {user?.name || "Traveler"}
                   </h3>
-                  <p className="text-sm text-slate-500">{user?.email}</p>
+                  <p className="text-sm text-slate-500">
+                    {user?.email || "No email"}
+                  </p>
                 </div>
               </div>
 
+              <label className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer">
+                <Upload size={17} />
+                {uploading ? "Uploading..." : "Upload Picture"}
+
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImageUpload}
+                  disabled={uploading}
+                />
+              </label>
+
               <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
-                <User size={17} />
-                View Profile
+                <Pencil size={17} />
+                Edit Profile
+              </button>
+
+              <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+                <Lock size={17} />
+                Change Password
+              </button>
+
+              <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
+                <Bell size={17} />
+                Notification Settings
               </button>
 
               <button

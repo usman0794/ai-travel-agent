@@ -14,7 +14,9 @@ import CTA from "./components/CTA";
 import AuthScreen from "./components/AuthScreen";
 
 // const API_URL = "http://127.0.0.1:8000";
-const API_URL = import.meta.env.VITE_API_URL;
+// const API_URL = import.metanv.VITE_API_URL;
+
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 export default function App() {
   const [message, setMessage] = useState("");
@@ -189,6 +191,7 @@ export default function App() {
           <div className="min-h-screen bg-[#f6f8ff] dark:bg-slate-950 text-slate-900 dark:text-white">
             <Navbar
               user={user}
+              setUser={setUser}
               logout={logout}
               theme={theme}
               setTheme={setTheme}

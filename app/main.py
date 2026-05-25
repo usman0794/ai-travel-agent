@@ -6,10 +6,12 @@ from app.services.groq_service import ask_ai
 from app.tools.weather_tool import get_weather
 from app.tools.hotel_tool import search_hotels
 from app.tools.route_tool import get_route_distance
+from app.routes import profile
 
 from app.routes.auth_routes import router as auth_router
 from app.routes.trip_routes import router as trip_router
 from app.routes.agent_routes import router as agent_router
+
 
 
 app = FastAPI(title="AI Travel Agent API")
@@ -27,7 +29,7 @@ app.add_middleware(
 app.include_router(auth_router)
 app.include_router(trip_router)
 app.include_router(agent_router)
-
+app.include_router(profile.router)
 
 @app.get("/")
 def home():
