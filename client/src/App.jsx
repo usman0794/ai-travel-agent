@@ -10,7 +10,7 @@ import Hero from "./components/Hero";
 import Services from "./components/Services";
 import Planner from "./components/Planner";
 import EditModal from "./components/EditModal";
-import CTA from "./components/CTA";
+
 import AuthScreen from "./components/AuthScreen";
 
 // const API_URL = "http://127.0.0.1:8000";
@@ -201,13 +201,15 @@ export default function App() {
 
             <Services sendMessage={sendMessage} />
 
-            <Planner
-              message={message}
-              setMessage={setMessage}
-              sendMessage={sendMessage}
-              loading={loading}
-              response={response}
-            />
+            <div id="planner">
+              <Planner
+                message={message}
+                setMessage={setMessage}
+                sendMessage={sendMessage}
+                loading={loading}
+                response={response}
+              />
+            </div>
 
             <Trips
               savedTrips={savedTrips}
@@ -216,8 +218,6 @@ export default function App() {
               setEditingTrip={setEditingTrip}
               setEditForm={setEditForm}
             />
-
-            <CTA sendMessage={sendMessage} />
 
             <Footer />
 

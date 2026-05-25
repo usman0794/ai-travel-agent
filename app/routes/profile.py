@@ -9,6 +9,9 @@ from app.database.db import get_db
 from app.models.user_model import User
 from app.services.auth_service import get_current_user_id
 
+from pydantic import BaseModel
+from app.services.auth_service import verify_password, hash_password
+
 router = APIRouter(prefix="/profile", tags=["Profile"])
 
 cloudinary.config(
@@ -18,6 +21,9 @@ cloudinary.config(
     secure=True,
 )
 
+class ChangePasswordSchema(BaseModel):
+    current_password: str
+    new_password: str
 
 @router.post("/upload-picture")
 async def upload_profile_picture(
@@ -54,3 +60,27 @@ async def upload_profile_picture(
         "message": "Profile picture uploaded successfully",
         "profile_picture": image_url,
     }
+
+
+@router.put("/change-password")
+def change_password(
+    data: ChangePasswordSchema,
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    user = db.query(User).filter(User.id == user_id).first()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    if not verify_password(data.current_password, user.hashed_password):
+        raise HTTPException(status_code=400, detail="Current password is incorrect")
+
+    user.hashed_password = hash_password(data.new_password)
+
+    db.commit()
+
+    return {"message": "Password changed successfully"}
