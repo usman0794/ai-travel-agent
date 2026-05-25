@@ -45,6 +45,13 @@ export default function App() {
     localStorage.setItem("theme", theme);
   }, [theme]);
 
+  useEffect(() => {
+    const savedUser = localStorage.getItem("user");
+    if (savedUser) {
+      setUser(JSON.parse(savedUser));
+    }
+  }, []);
+
   const authHeaders = { Authorization: `Bearer ${token}` };
 
   const fetchTrips = async (authToken = token) => {
@@ -118,6 +125,7 @@ export default function App() {
 
       setToken(res.data.access_token);
       setUser(res.data.user);
+      localStorage.setItem("user", JSON.stringify(res.data.user));
 
       fetchTrips(res.data.access_token);
     } catch {

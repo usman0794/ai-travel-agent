@@ -254,7 +254,11 @@ export default function Navbar({ user, setUser, logout, theme, setTheme }) {
                   {/* Edit Profile */}
                   <button
                     onClick={() => {
-                      setEditName(user?.name || "");
+                      const savedUser = JSON.parse(
+                        localStorage.getItem("user") || "{}",
+                      );
+
+                      setEditName(user?.name || savedUser?.name || "");
                       setOpenProfile(false);
                       setOpenEdit(true);
                     }}

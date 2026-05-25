@@ -25,6 +25,9 @@ class ChangePasswordSchema(BaseModel):
     current_password: str
     new_password: str
 
+class UpdateProfileSchema(BaseModel):
+    name: str
+
 @router.post("/upload-picture")
 async def upload_profile_picture(
     file: UploadFile = File(...),
@@ -59,6 +62,36 @@ async def upload_profile_picture(
     return {
         "message": "Profile picture uploaded successfully",
         "profile_picture": image_url,
+    }
+
+
+@router.put("/update")
+def update_profile(
+    data: UpdateProfileSchema,
+    user_id: int = Depends(get_current_user_id),
+    db: Session = Depends(get_db),
+):
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    user = db.query(User).filter(User.id == user_id).first()
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    user.name = data.name
+
+    db.commit()
+    db.refresh(user)
+
+    return {
+        "message": "Profile updated successfully",
+        "user": {
+            "id": user.id,
+            "name": user.name,
+            "email": user.email,
+            "profile_picture": user.profile_picture,
+        },
     }
 
 
