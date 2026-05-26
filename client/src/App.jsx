@@ -13,13 +13,13 @@ import TripDetails from "./pages/TripDetails";
 
 import AuthScreen from "./components/AuthScreen";
 
-const API_URL = "http://127.0.0.1:8000";
+// const API_URL = "http://127.0.0.1:8000";
 // const API_URL = import.metanv.VITE_API_URL;
 
-// const API_URL =
-//   import.meta.env.VITE_API_URL ||
-//   "http://localhost:8000" ||
-//   "http://127.0.0.1:8000";
+const API_URL =
+  import.meta.env.VITE_API_URL ||
+  "http://localhost:8000" ||
+  "http://127.0.0.1:8000";
 
 export default function App() {
   const [message, setMessage] = useState("");
