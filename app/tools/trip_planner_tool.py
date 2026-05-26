@@ -3,6 +3,7 @@ import re
 from datetime import datetime, timedelta
 
 from app.services.groq_service import ask_ai
+from app.services.currency_service import prepare_budget_for_trip
 from app.tools.hotel_tool import search_hotels
 from app.tools.weather_tool import get_weather
 from app.database.db import SessionLocal
@@ -17,9 +18,9 @@ Return ONLY valid JSON.
 
 Format:
 {{
+  "source": "",
   "destination": "",
-  "days": 0,
-  "budget": 0
+  "days": 0
 }}
 
 Message:
@@ -34,12 +35,11 @@ Message:
 
     except Exception:
         days_match = re.search(r"(\d+)[-\s]?day", message.lower())
-        budget_match = re.search(r"(?:under|budget is|budget)\s*(\d+)", message.lower())
 
         return {
+            "source": None,
             "destination": "Kashmir",
             "days": int(days_match.group(1)) if days_match else 3,
-            "budget": int(budget_match.group(1)) if budget_match else None,
         }
 
 
@@ -56,7 +56,6 @@ Day {day}: Arrival in {destination}
 - Try local food
 """
             )
-
         elif day == days:
             itinerary_parts.append(
                 f"""
@@ -66,7 +65,6 @@ Day {day}: Departure Day
 - Departure preparation
 """
             )
-
         else:
             itinerary_parts.append(
                 f"""
@@ -81,11 +79,17 @@ Day {day}: Explore {destination}
 
 
 def create_trip_plan(message: str, user_id: int):
+    budget_data = prepare_budget_for_trip(message)
+
+    budget = budget_data["budget"]
+    budget_currency = budget_data["budget_currency"]
+    estimated_cost_usd = budget_data["estimated_cost_usd"]
+
     details = extract_trip_details(message)
 
+    source = details.get("source")
     destination = details.get("destination") or "Kashmir"
     days = int(details.get("days") or 3)
-    budget = details.get("budget")
 
     start_date = datetime.now()
     end_date = start_date + timedelta(days=days)
@@ -96,18 +100,20 @@ def create_trip_plan(message: str, user_id: int):
     hotel_names = []
 
     if isinstance(hotels, dict):
-        for hotel in hotels.get("hotels", [])[:3]:
-            hotel_names.append(hotel.get("name", "Unknown Hotel"))
+      for hotel in hotels.get("hotels", [])[:3]:
+          hotel_names.append(hotel.get("name", "Unknown Hotel"))
 
     elif isinstance(hotels, list):
         hotel_names = hotels[:3]
 
-    estimated_hotel_cost = days * 5000
-    estimated_transport_cost = 3000
-    total_estimated_cost = estimated_hotel_cost + estimated_transport_cost
+    if estimated_cost_usd is None:
+        estimated_hotel_cost_usd = days * 25
+        estimated_transport_cost_usd = 15
+        estimated_cost_usd = estimated_hotel_cost_usd + estimated_transport_cost_usd
 
-    if not budget:
-        budget = total_estimated_cost + 5000
+    if budget is None:
+        budget = estimated_cost_usd
+        budget_currency = "USD"
 
     itinerary = generate_itinerary(destination, days)
 
@@ -115,12 +121,14 @@ def create_trip_plan(message: str, user_id: int):
 
     try:
         trip = Trip(
+            source=source,
             destination=destination,
             days=days,
             budget=int(budget),
+            budget_currency=budget_currency,
+            estimated_cost_usd=int(estimated_cost_usd),
             start_date=start_date.strftime("%b %d, %Y"),
             end_date=end_date.strftime("%b %d, %Y"),
-            estimated_cost=total_estimated_cost,
             hotels=", ".join(hotel_names),
             selected_hotel=hotel_names[0] if hotel_names else None,
             itinerary=itinerary,
@@ -136,6 +144,7 @@ def create_trip_plan(message: str, user_id: int):
 
     return (
         f"Your {days}-day trip to {destination} is ready. "
+        f"Estimated cost: ${int(estimated_cost_usd)} USD. "
         f"Open the trip card to view the full itinerary, hotel, budget, "
         f"weather and travel details."
     )

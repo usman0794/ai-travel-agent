@@ -1,14 +1,4 @@
-import {
-  Plane,
-  Mail,
-  Lock,
-  User,
-  Eye,
-  EyeOff,
-  Sparkles,
-  Shield,
-  Globe,
-} from "lucide-react";
+import { Plane, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import authImage from "../assets/travel-hero.png";
 
@@ -23,66 +13,39 @@ export default function AuthScreen({
   const [showPassword, setShowPassword] = useState(false);
 
   return (
-    <div className="min-h-screen w-full bg-white overflow-hidden">
-      <div className="min-h-screen w-full grid lg:grid-cols-2">
-        {/* LEFT IMAGE SIDE */}
+    <div className="min-h-screen w-full bg-white dark:bg-slate-950 overflow-hidden">
+      <div className="min-h-screen w-full lg:grid lg:grid-cols-2">
+        {/* LEFT IMAGE SIDE - DESKTOP ONLY */}
         <div
-          className="relative h-[40vh] lg:h-screen bg-cover bg-center text-white"
+          className="hidden lg:block relative h-screen bg-cover bg-center text-white"
           style={{ backgroundImage: `url(${authImage})` }}
         >
           <div className="absolute inset-0 bg-black/35" />
 
-          <div className="relative z-10 h-full flex flex-col justify-between p-6 lg:p-10">
-            <div className="flex items-center gap-3">
-              <div className="w-11 h-11 rounded-xl bg-indigo-600 flex items-center justify-center shadow-lg">
-                <Plane size={24} />
-              </div>
+          <div className="relative z-10 h-full flex flex-col justify-between p-10">
+            {/* Top: Logo */}
+            <div className="flex items-center gap-3"></div>
 
-              <div>
-                <h1 className="text-xl lg:text-2xl font-extrabold">
-                  AI TRAVEL AGENT
-                </h1>
-                <p className="text-sm lg:text-base text-white/85">
-                  Explore more, worry less
-                </p>
-              </div>
-            </div>
-
-            <div className="max-w-lg">
-              <h2 className="text-3xl lg:text-5xl font-extrabold leading-tight">
+            {/* Center: Main Message */}
+            <div className="text-center max-w-lg mx-auto">
+              <h2 className="text-5xl font-extrabold leading-tight">
                 Let AI plan your{" "}
-                <span className="text-blue-500">perfect trip</span>
+                <span className="text-indigo-400">perfect trip</span>
               </h2>
-
-              <p className="mt-3 text-base lg:text-lg text-white/90">
+              <p className="mt-4 text-lg text-white/90">
                 Smart recommendations, customized for you.
               </p>
             </div>
 
-            <div className="hidden lg:grid grid-cols-3 gap-3 rounded-2xl bg-white/80 backdrop-blur-md p-3 text-slate-900">
-              <Feature
-                icon={<Sparkles size={20} />}
-                title="AI Powered"
-                text="Smart itineraries"
-              />
-              <Feature
-                icon={<Shield size={20} />}
-                title="Secure & Safe"
-                text="Your data protected"
-              />
-              <Feature
-                icon={<Globe size={20} />}
-                title="Global Support"
-                text="We're here for you"
-              />
-            </div>
+            {/* Bottom: Empty spacer for balance */}
+            <div></div>
           </div>
         </div>
 
         {/* RIGHT FORM SIDE */}
-        <div className="flex items-center justify-center p-5 lg:p-10 bg-white dark:bg-slate-950">
+        <div className="min-h-screen flex items-center justify-center px-5 py-10 lg:p-10 bg-white dark:bg-slate-950">
           <div className="w-full max-w-md">
-            <div className="text-center mb-6">
+            <div className="text-center mb-8">
               <div className="mx-auto w-14 h-14 rounded-2xl bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center mb-3">
                 <Plane className="text-indigo-600" size={28} />
               </div>
@@ -126,7 +89,7 @@ export default function AuthScreen({
               />
 
               <input
-                className="w-full h-13 rounded-xl border border-slate-200 pl-14 pr-14 py-3 outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-900 dark:border-slate-700 dark:text-white"
+                className="w-full rounded-xl border border-slate-200 pl-14 pr-14 py-3 outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-900 dark:border-slate-700 dark:text-white"
                 type={showPassword ? "text" : "password"}
                 placeholder="Enter your password"
                 value={authForm.password}
@@ -146,7 +109,7 @@ export default function AuthScreen({
 
             {authMode === "login" && (
               <div className="text-right mb-5">
-                <button className="text-sm font-medium text-indigo-600">
+                <button className="text-sm font-medium text-indigo-600 hover:text-indigo-700 transition">
                   Forgot password?
                 </button>
               </div>
@@ -155,24 +118,29 @@ export default function AuthScreen({
             <button
               onClick={handleAuth}
               disabled={authLoading}
-              className="w-full h-13 py-3 rounded-xl bg-gradient-to-r from-indigo-700 to-indigo-500 text-white font-semibold shadow-lg hover:opacity-95 transition"
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-indigo-500 text-white font-semibold shadow-lg hover:shadow-xl transition-all disabled:opacity-60"
             >
-              {authLoading
-                ? "Processing..."
-                : authMode === "login"
-                  ? "Login"
-                  : "Create Account"}
+              {authLoading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Processing...
+                </div>
+              ) : authMode === "login" ? (
+                "Login"
+              ) : (
+                "Create Account"
+              )}
             </button>
 
             {authMode === "login" && (
               <>
                 <div className="flex items-center gap-4 my-5 text-sm text-slate-400">
-                  <div className="h-px flex-1 bg-slate-200" />
+                  <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
                   or continue with
-                  <div className="h-px flex-1 bg-slate-200" />
+                  <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
                 </div>
 
-                <button className="w-full h-13 py-3 rounded-xl border border-slate-200 flex items-center justify-center gap-3 font-semibold hover:bg-slate-50 transition dark:border-slate-700 dark:hover:bg-slate-900">
+                <button className="w-full py-3 rounded-xl border border-slate-200 flex items-center justify-center gap-3 font-semibold hover:bg-slate-50 transition dark:border-slate-700 dark:hover:bg-slate-900 dark:text-white">
                   <GoogleIcon />
                   Continue with Google
                 </button>
@@ -183,13 +151,13 @@ export default function AuthScreen({
               onClick={() =>
                 setAuthMode(authMode === "login" ? "signup" : "login")
               }
-              className="w-full mt-5 text-slate-500"
+              className="w-full mt-5 text-slate-500 hover:text-slate-700 transition"
             >
               {authMode === "login"
-                ? "Don’t have an account? "
+                ? "Don't have an account? "
                 : "Already have an account? "}
 
-              <span className="text-indigo-600 font-semibold">
+              <span className="text-indigo-600 font-semibold hover:underline">
                 {authMode === "login" ? "Sign up" : "Login"}
               </span>
             </button>
@@ -209,20 +177,8 @@ function InputBox({ icon, ...props }) {
 
       <input
         {...props}
-        className="w-full h-13 rounded-xl border border-slate-200 pl-14 pr-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-slate-900 dark:border-slate-700 dark:text-white"
+        className="w-full rounded-xl border border-slate-200 pl-14 pr-4 py-3 outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition dark:bg-slate-900 dark:border-slate-700 dark:text-white"
       />
-    </div>
-  );
-}
-
-function Feature({ icon, title, text }) {
-  return (
-    <div className="flex items-center gap-2">
-      <div className="text-indigo-600">{icon}</div>
-      <div>
-        <h4 className="text-xs font-bold">{title}</h4>
-        <p className="text-[11px] text-slate-500">{text}</p>
-      </div>
     </div>
   );
 }

@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.database.db import engine
+from app.database.base import Base
+
 from app.services.groq_service import ask_ai
 from app.tools.weather_tool import get_weather
 from app.tools.hotel_tool import search_hotels
@@ -15,11 +17,19 @@ from app.routes.agent_routes import router as agent_router
 
 
 app = FastAPI(title="AI Travel Agent API")
+# Create database tables if they do not exist
+# Base.metadata.create_all(bind=engine)
 
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173","http://localhost:3000","https://your-vercel-app.vercel.app","https://tripnovaai.vercel.app"],
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://tripnovaai.vercel.app",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

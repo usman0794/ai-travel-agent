@@ -1,6 +1,6 @@
 import { Bot, MapPin, Wallet, Bookmark, ArrowRight } from "lucide-react";
 
-export default function Services({ sendMessage }) {
+export default function Services({ setMessage }) {
   const services = [
     {
       icon: <Bot size={28} />,
@@ -32,6 +32,15 @@ export default function Services({ sendMessage }) {
     },
   ];
 
+  const handleServiceClick = (prompt) => {
+    setMessage(prompt);
+
+    document.getElementById("planner")?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
+
   return (
     <section id="services" className="max-w-7xl mx-auto px-6 py-12">
       <div className="text-center mb-14">
@@ -48,7 +57,7 @@ export default function Services({ sendMessage }) {
         {services.map((service, index) => (
           <button
             key={index}
-            onClick={() => sendMessage(service.prompt)}
+            onClick={() => handleServiceClick(service.prompt)}
             className="group bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-3xl p-7 text-left shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all min-h-[260px] flex flex-col"
           >
             <div

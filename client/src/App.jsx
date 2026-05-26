@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Routes, Route } from "react-router-dom";
-import TripDetails from "./pages/TripDetails";
 
 import Footer from "./components/Footer";
 import Trips from "./components/Trips";
@@ -10,13 +9,17 @@ import Hero from "./components/Hero";
 import Services from "./components/Services";
 import Planner from "./components/Planner";
 import EditModal from "./components/EditModal";
+import TripDetails from "./pages/TripDetails";
 
 import AuthScreen from "./components/AuthScreen";
 
-// const API_URL = "http://127.0.0.1:8000";
+const API_URL = "http://127.0.0.1:8000";
 // const API_URL = import.metanv.VITE_API_URL;
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+// const API_URL =
+//   import.meta.env.VITE_API_URL ||
+//   "http://localhost:8000" ||
+//   "http://127.0.0.1:8000";
 
 export default function App() {
   const [message, setMessage] = useState("");
@@ -207,7 +210,7 @@ export default function App() {
 
             <Hero sendMessage={sendMessage} />
 
-            <Services sendMessage={sendMessage} />
+            <Services setMessage={setMessage} />
 
             <div id="planner">
               <Planner

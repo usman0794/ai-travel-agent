@@ -24,12 +24,14 @@ def get_trips(user_id: int = Depends(get_current_user_id)):
                 "destination": trip.destination,
                 "days": trip.days,
                 "budget": trip.budget,
-                "estimated_cost": trip.estimated_cost,
+                "budget_currency": trip.budget_currency,
+                "estimated_cost_usd": trip.estimated_cost_usd,
                 "hotels": trip.hotels,
                 "selected_hotel": trip.selected_hotel,
                 "status": trip.status,
                 "start_date": trip.start_date,
                 "end_date": trip.end_date,
+                "itinerary": trip.itinerary,
             }
             for trip in trips
         ]

@@ -46,18 +46,23 @@ export default function TripCard({
       </div>
 
       <div className="p-5">
-        <h3 className="font-bold text-lg mb-4">{trip.destination}</h3>
+        <h3 className="font-bold text-lg mb-4">
+          {trip.source
+            ? `${trip.source} → ${trip.destination}`
+            : trip.destination}
+        </h3>
 
         <div className="flex items-center gap-6 text-sm text-slate-500 mb-4">
           <span>📅 {trip.days} Days</span>
-          <span>💰 ${Math.round(trip.estimated_cost / 280)}</span>
+          <span>💰 ${Math.round(trip.estimated_cost_usd || 0)}</span>
         </div>
 
         <p className="text-sm text-slate-500 mb-5">
           Hotel: {trip.selected_hotel || "Not selected"}
         </p>
         <p className="text-sm text-slate-500 mb-5">
-          {new Date().toLocaleDateString()} • {trip.days} Day Trip
+          {trip.start_date || "Start date not set"} →{" "}
+          {trip.end_date || "End date not set"}
         </p>
 
         {trip.status === "draft" && (
