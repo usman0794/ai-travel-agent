@@ -6,7 +6,7 @@ export default function Services({ setMessage }) {
       icon: <Bot size={28} />,
       title: "AI Trip Planning",
       desc: "Get personalized travel itineraries powered by advanced AI.",
-      prompt: "Book me a 3-day Lahore trip under 15000 PKR",
+      prompt: "Book me a 7-days Honeymoon trip ....",
       color: "bg-indigo-100 text-indigo-600",
     },
     {
@@ -27,7 +27,7 @@ export default function Services({ setMessage }) {
       icon: <Bookmark size={28} />,
       title: "Save & Manage",
       desc: "Save your trips, confirm bookings, and manage them easily.",
-      prompt: "Book me a 3-day Kashmir trip under 15000 PKR",
+      prompt: "Book me a 3-day Kashmir trip from lahore under 25000 PKR",
       color: "bg-pink-100 text-pink-600",
     },
   ];
@@ -35,10 +35,12 @@ export default function Services({ setMessage }) {
   const handleServiceClick = (prompt) => {
     setMessage(prompt);
 
-    document.getElementById("planner")?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
+    setTimeout(() => {
+      document.getElementById("planner")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }, 100);
   };
 
   return (

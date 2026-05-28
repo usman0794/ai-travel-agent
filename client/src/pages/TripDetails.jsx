@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import {
   Calendar,
@@ -11,6 +12,14 @@ import {
 
 export default function TripDetails({ savedTrips }) {
   const { id } = useParams();
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "instant",
+    });
+  }, [id]);
 
   const trip = savedTrips.find((t) => String(t.id) === id);
 

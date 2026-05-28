@@ -29,8 +29,6 @@ export default function Navbar({ user, setUser, logout, theme, setTheme }) {
   const profileRef = useRef(null);
   const editModalRef = useRef(null);
   const submenuTimeoutRef = useRef(null);
-  const securityButtonRef = useRef(null);
-  const notificationsButtonRef = useRef(null);
 
   const profilePic = user?.profile_picture || profileImage;
 
@@ -199,7 +197,7 @@ export default function Navbar({ user, setUser, logout, theme, setTheme }) {
 
             {/* Profile Dropdown */}
             {openProfile && (
-              <div className="absolute right-0 top-14 w-80 bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200/50 dark:border-slate-700/50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+              <div className="absolute right-0 top-14 w-[calc(100vw-1.5rem)] sm:w-80 max-w-80 bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200/50 dark:border-slate-700/50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                 {/* User Info Header */}
                 <div className="flex items-center gap-3 p-4 border-b border-slate-100 dark:border-slate-800">
                   <img
@@ -273,13 +271,24 @@ export default function Navbar({ user, setUser, logout, theme, setTheme }) {
                     </span>
                   </button>
 
-                  {/* Security & Privacy - WITH SUBMENU */}
+                  {/* Security & Privacy - mobile safe submenu */}
                   <div
-                    ref={securityButtonRef}
-                    onMouseEnter={() => handleMenuItemHover("security")}
-                    onMouseLeave={handleMenuItemLeave}
+                    onMouseEnter={() =>
+                      window.innerWidth >= 768 &&
+                      handleMenuItemHover("security")
+                    }
+                    onMouseLeave={() =>
+                      window.innerWidth >= 768 && handleMenuItemLeave()
+                    }
                   >
-                    <button className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group">
+                    <button
+                      onClick={() =>
+                        setActiveSubmenu(
+                          activeSubmenu === "security" ? null : "security",
+                        )
+                      }
+                      className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
+                    >
                       <div className="flex items-center gap-3">
                         <Lock
                           size={17}
@@ -289,17 +298,53 @@ export default function Navbar({ user, setUser, logout, theme, setTheme }) {
                           Security & Privacy
                         </span>
                       </div>
-                      <ChevronRight size={14} className="text-slate-400" />
+                      <ChevronRight
+                        size={14}
+                        className={`text-slate-400 transition-transform ${
+                          activeSubmenu === "security" ? "rotate-90" : ""
+                        }`}
+                      />
                     </button>
+
+                    {activeSubmenu === "security" && (
+                      <div className="mt-1 ml-8 rounded-lg bg-slate-50 dark:bg-slate-800 p-2 animate-in fade-in slide-in-from-top-1 duration-150">
+                        <div className="px-3 py-2">
+                          <p className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
+                            SECURITY
+                          </p>
+                        </div>
+                        <button className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-white dark:hover:bg-slate-700 transition-colors">
+                          <div className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                            Change Password
+                          </div>
+                          <div className="text-xs text-slate-500 mt-0.5">
+                            Update your password
+                          </div>
+                        </button>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Notifications - WITH SUBMENU */}
+                  {/* Notifications - mobile safe submenu */}
                   <div
-                    ref={notificationsButtonRef}
-                    onMouseEnter={() => handleMenuItemHover("notifications")}
-                    onMouseLeave={handleMenuItemLeave}
+                    onMouseEnter={() =>
+                      window.innerWidth >= 768 &&
+                      handleMenuItemHover("notifications")
+                    }
+                    onMouseLeave={() =>
+                      window.innerWidth >= 768 && handleMenuItemLeave()
+                    }
                   >
-                    <button className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group">
+                    <button
+                      onClick={() =>
+                        setActiveSubmenu(
+                          activeSubmenu === "notifications"
+                            ? null
+                            : "notifications",
+                        )
+                      }
+                      className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group"
+                    >
                       <div className="flex items-center gap-3">
                         <Bell
                           size={17}
@@ -309,8 +354,67 @@ export default function Navbar({ user, setUser, logout, theme, setTheme }) {
                           Notifications
                         </span>
                       </div>
-                      <ChevronRight size={14} className="text-slate-400" />
+                      <ChevronRight
+                        size={14}
+                        className={`text-slate-400 transition-transform ${
+                          activeSubmenu === "notifications" ? "rotate-90" : ""
+                        }`}
+                      />
                     </button>
+
+                    {activeSubmenu === "notifications" && (
+                      <div className="mt-1 ml-8 rounded-lg bg-slate-50 dark:bg-slate-800 p-2 animate-in fade-in slide-in-from-top-1 duration-150">
+                        <div className="px-3 py-2">
+                          <p className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
+                            Notification Preferences
+                          </p>
+                        </div>
+
+                        <label className="flex items-center justify-between px-3 py-3 rounded-lg hover:bg-white dark:hover:bg-slate-700 cursor-pointer transition-colors">
+                          <span className="text-sm text-slate-700 dark:text-slate-300">
+                            Push Notifications
+                          </span>
+                          <div className="relative inline-block w-10 h-5 transition-all">
+                            <input
+                              type="checkbox"
+                              className="peer opacity-0 w-0 h-0"
+                              defaultChecked
+                            />
+                            <div className="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-slate-300 dark:bg-slate-700 rounded-full peer-checked:bg-indigo-600 transition-colors"></div>
+                            <div className="absolute content-[''] h-4 w-4 left-0.5 bottom-0.5 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
+                          </div>
+                        </label>
+
+                        <label className="flex items-center justify-between px-3 py-3 rounded-lg hover:bg-white dark:hover:bg-slate-700 cursor-pointer transition-colors">
+                          <span className="text-sm text-slate-700 dark:text-slate-300">
+                            Email Notifications
+                          </span>
+                          <div className="relative inline-block w-10 h-5 transition-all">
+                            <input
+                              type="checkbox"
+                              className="peer opacity-0 w-0 h-0"
+                              defaultChecked
+                            />
+                            <div className="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-slate-300 dark:bg-slate-700 rounded-full peer-checked:bg-indigo-600 transition-colors"></div>
+                            <div className="absolute content-[''] h-4 w-4 left-0.5 bottom-0.5 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
+                          </div>
+                        </label>
+
+                        <label className="flex items-center justify-between px-3 py-3 rounded-lg hover:bg-white dark:hover:bg-slate-700 cursor-pointer transition-colors">
+                          <span className="text-sm text-slate-700 dark:text-slate-300">
+                            Travel Deals
+                          </span>
+                          <div className="relative inline-block w-10 h-5 transition-all">
+                            <input
+                              type="checkbox"
+                              className="peer opacity-0 w-0 h-0"
+                            />
+                            <div className="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-slate-300 dark:bg-slate-700 rounded-full peer-checked:bg-indigo-600 transition-colors"></div>
+                            <div className="absolute content-[''] h-4 w-4 left-0.5 bottom-0.5 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
+                          </div>
+                        </label>
+                      </div>
+                    )}
                   </div>
 
                   {/* Divider */}
@@ -327,117 +431,6 @@ export default function Navbar({ user, setUser, logout, theme, setTheme }) {
                     </span>
                   </button>
                 </div>
-
-                {/* Security Submenu */}
-                {activeSubmenu === "security" && securityButtonRef.current && (
-                  <div
-                    className="fixed bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200/50 dark:border-slate-700/50 overflow-hidden animate-in fade-in slide-in-from-left-1 duration-150"
-                    style={{
-                      top: securityButtonRef.current.getBoundingClientRect()
-                        .top,
-                      left:
-                        securityButtonRef.current.getBoundingClientRect().left -
-                        288 -
-                        8,
-                      width: "288px",
-                    }}
-                    onMouseEnter={() => {
-                      if (submenuTimeoutRef.current)
-                        clearTimeout(submenuTimeoutRef.current);
-                      setActiveSubmenu("security");
-                    }}
-                    onMouseLeave={handleSubmenuLeave}
-                  >
-                    <div className="p-2">
-                      <div className="px-3 py-2 bg-gradient-to-r from-indigo-50 to-transparent dark:from-indigo-950/50">
-                        <p className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
-                          SECURITY
-                        </p>
-                      </div>
-                      <button className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group">
-                        <div className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                          Change Password
-                        </div>
-                        <div className="text-xs text-slate-500 mt-0.5">
-                          Update your password
-                        </div>
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                {/* Notifications Submenu */}
-                {activeSubmenu === "notifications" &&
-                  notificationsButtonRef.current && (
-                    <div
-                      className="fixed bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200/50 dark:border-slate-700/50 overflow-hidden animate-in fade-in slide-in-from-left-1 duration-150"
-                      style={{
-                        top: notificationsButtonRef.current.getBoundingClientRect()
-                          .top,
-                        left:
-                          notificationsButtonRef.current.getBoundingClientRect()
-                            .left -
-                          320 -
-                          8,
-                        width: "320px",
-                      }}
-                      onMouseEnter={() => {
-                        if (submenuTimeoutRef.current)
-                          clearTimeout(submenuTimeoutRef.current);
-                        setActiveSubmenu("notifications");
-                      }}
-                      onMouseLeave={handleSubmenuLeave}
-                    >
-                      <div className="p-2">
-                        <div className="px-3 py-2 bg-gradient-to-r from-indigo-50 to-transparent dark:from-indigo-950/50">
-                          <p className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">
-                            Notification Preferences
-                          </p>
-                        </div>
-                        <label className="flex items-center justify-between px-3 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-colors">
-                          <span className="text-sm text-slate-700 dark:text-slate-300">
-                            Push Notifications
-                          </span>
-                          <div className="relative inline-block w-10 h-5 transition-all">
-                            <input
-                              type="checkbox"
-                              className="peer opacity-0 w-0 h-0"
-                              defaultChecked
-                            />
-                            <div className="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-slate-300 dark:bg-slate-700 rounded-full peer-checked:bg-indigo-600 transition-colors"></div>
-                            <div className="absolute content-[''] h-4 w-4 left-0.5 bottom-0.5 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
-                          </div>
-                        </label>
-                        <label className="flex items-center justify-between px-3 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-colors">
-                          <span className="text-sm text-slate-700 dark:text-slate-300">
-                            Email Notifications
-                          </span>
-                          <div className="relative inline-block w-10 h-5 transition-all">
-                            <input
-                              type="checkbox"
-                              className="peer opacity-0 w-0 h-0"
-                              defaultChecked
-                            />
-                            <div className="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-slate-300 dark:bg-slate-700 rounded-full peer-checked:bg-indigo-600 transition-colors"></div>
-                            <div className="absolute content-[''] h-4 w-4 left-0.5 bottom-0.5 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
-                          </div>
-                        </label>
-                        <label className="flex items-center justify-between px-3 py-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-colors">
-                          <span className="text-sm text-slate-700 dark:text-slate-300">
-                            Travel Deals
-                          </span>
-                          <div className="relative inline-block w-10 h-5 transition-all">
-                            <input
-                              type="checkbox"
-                              className="peer opacity-0 w-0 h-0"
-                            />
-                            <div className="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-slate-300 dark:bg-slate-700 rounded-full peer-checked:bg-indigo-600 transition-colors"></div>
-                            <div className="absolute content-[''] h-4 w-4 left-0.5 bottom-0.5 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
-                          </div>
-                        </label>
-                      </div>
-                    </div>
-                  )}
               </div>
             )}
           </div>

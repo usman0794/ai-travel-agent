@@ -10,8 +10,9 @@ export default function Trips({
 }) {
   const [showAllTrips, setShowAllTrips] = useState(false);
 
-  const visibleTrips = showAllTrips ? savedTrips : savedTrips.slice(0, 3);
+  const sortedTrips = [...savedTrips].reverse();
 
+  const visibleTrips = showAllTrips ? sortedTrips : sortedTrips.slice(0, 3);
   return (
     <section id="trips" className="max-w-7xl mx-auto px-6 py-8">
       <div className="flex items-center justify-between mb-4">

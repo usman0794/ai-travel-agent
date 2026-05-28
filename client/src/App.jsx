@@ -18,7 +18,7 @@ import AuthScreen from "./components/AuthScreen";
 
 const API_URL =
   import.meta.env.VITE_API_URL ||
-  "http://localhost:8000" ||
+  "http://localhost:8000" || 
   "http://127.0.0.1:8000";
 
 export default function App() {
