@@ -26,6 +26,15 @@ export default function Navbar({ user, setUser, logout, theme, setTheme }) {
   const [activeSubmenu, setActiveSubmenu] = useState(null);
   const [isSaving, setIsSaving] = useState(false);
 
+  const [openChangePassword, setOpenChangePassword] = useState(false);
+  const [passwordForm, setPasswordForm] = useState({
+    current_password: "",
+    new_password: "",
+    confirm_password: "",
+  });
+  const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordMessage, setPasswordMessage] = useState("");
+
   const profileRef = useRef(null);
   const editModalRef = useRef(null);
   const submenuTimeoutRef = useRef(null);
@@ -153,6 +162,63 @@ export default function Navbar({ user, setUser, logout, theme, setTheme }) {
     if (tripsSection) {
       tripsSection.scrollIntoView({ behavior: "smooth" });
       setOpenProfile(false);
+    }
+  };
+
+  const handleChangePassword = async () => {
+    setPasswordMessage("");
+
+    if (
+      !passwordForm.current_password ||
+      !passwordForm.new_password ||
+      !passwordForm.confirm_password
+    ) {
+      setPasswordMessage("Please fill all fields");
+      return;
+    }
+
+    if (passwordForm.new_password !== passwordForm.confirm_password) {
+      setPasswordMessage("New password and confirm password do not match");
+      return;
+    }
+
+    try {
+      setPasswordLoading(true);
+
+      const token = localStorage.getItem("token");
+
+      const res = await axios.post(
+        `${API_URL}/change-password`,
+        {
+          current_password: passwordForm.current_password,
+          new_password: passwordForm.new_password,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      setPasswordMessage(res.data.message);
+
+      if (res.data.success) {
+        setPasswordForm({
+          current_password: "",
+          new_password: "",
+          confirm_password: "",
+        });
+
+        setTimeout(() => {
+          setOpenChangePassword(false);
+          setPasswordMessage("");
+        }, 1000);
+      }
+    } catch (error) {
+      console.error("Password change error:", error);
+      setPasswordMessage("Failed to change password");
+    } finally {
+      setPasswordLoading(false);
     }
   };
 
@@ -313,7 +379,14 @@ export default function Navbar({ user, setUser, logout, theme, setTheme }) {
                             SECURITY
                           </p>
                         </div>
-                        <button className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-white dark:hover:bg-slate-700 transition-colors">
+                        <button
+                          onClick={() => {
+                            setOpenProfile(false);
+                            setActiveSubmenu(null);
+                            setOpenChangePassword(true);
+                          }}
+                          className="w-full text-left px-3 py-2.5 rounded-lg hover:bg-white dark:hover:bg-slate-700 transition-colors"
+                        >
                           <div className="text-sm font-medium text-slate-700 dark:text-slate-300">
                             Change Password
                           </div>
@@ -523,6 +596,98 @@ export default function Navbar({ user, setUser, logout, theme, setTheme }) {
                     Save Changes
                   </>
                 )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {openChangePassword && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+            onClick={() => setOpenChangePassword(false)}
+          />
+
+          <div className="relative w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-2xl">
+            <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800">
+              <div>
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+                  Change Password
+                </h2>
+                <p className="text-sm text-slate-500 mt-1">
+                  Update your account password
+                </p>
+              </div>
+
+              <button
+                onClick={() => setOpenChangePassword(false)}
+                className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+              >
+                <X size={20} className="text-slate-500" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <input
+                type="password"
+                placeholder="Current Password"
+                value={passwordForm.current_password}
+                onChange={(e) =>
+                  setPasswordForm({
+                    ...passwordForm,
+                    current_password: e.target.value,
+                  })
+                }
+                className="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+
+              <input
+                type="password"
+                placeholder="New Password"
+                value={passwordForm.new_password}
+                onChange={(e) =>
+                  setPasswordForm({
+                    ...passwordForm,
+                    new_password: e.target.value,
+                  })
+                }
+                className="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+
+              <input
+                type="password"
+                placeholder="Confirm New Password"
+                value={passwordForm.confirm_password}
+                onChange={(e) =>
+                  setPasswordForm({
+                    ...passwordForm,
+                    confirm_password: e.target.value,
+                  })
+                }
+                className="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+
+              {passwordMessage && (
+                <p className="text-sm font-medium text-indigo-600">
+                  {passwordMessage}
+                </p>
+              )}
+            </div>
+
+            <div className="flex gap-3 p-6 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 rounded-b-2xl">
+              <button
+                onClick={() => setOpenChangePassword(false)}
+                className="flex-1 px-4 py-2.5 rounded-xl bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-700"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleChangePassword}
+                disabled={passwordLoading}
+                className="flex-1 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-medium disabled:opacity-50"
+              >
+                {passwordLoading ? "Updating..." : "Update"}
               </button>
             </div>
           </div>
