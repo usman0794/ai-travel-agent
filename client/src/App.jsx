@@ -191,6 +191,7 @@ export default function App() {
         setAuthForm={setAuthForm}
         handleAuth={handleAuth}
         setUser={setUser}
+        setToken={setToken}
       />
     );
   }

@@ -14,6 +14,7 @@ export default function AuthScreen({
   setAuthForm,
   handleAuth,
   setUser,
+  setToken,
 }) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -159,6 +160,7 @@ export default function AuthScreen({
                             "user",
                             JSON.stringify(res.data.user),
                           );
+                          setToken(res.data.access_token);
                           setUser(res.data.user);
                         } else {
                           alert(res.data.message || "Google login failed");
