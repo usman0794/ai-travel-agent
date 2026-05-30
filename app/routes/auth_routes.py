@@ -3,7 +3,11 @@ from jose import JWTError, jwt
 
 from app.database.db import SessionLocal
 from app.models.user_model import User
-from app.schemas.auth_schema import SignupSchema, LoginSchema, ChangePasswordSchema
+from app.schemas.auth_schema import SignupSchema, LoginSchema, ChangePasswordSchema,GoogleAuthSchema
+
+from google.oauth2 import id_token
+from google.auth.transport import requests
+import os
 
 from app.services.auth_service import (
     hash_password,
@@ -116,6 +120,61 @@ def change_password(data: ChangePasswordSchema, authorization: str = Header(None
         db.commit()
 
         return {"success": True, "message": "Password changed successfully"}
+
+    finally:
+        db.close()
+
+@router.post("/google")
+def google_auth(data: GoogleAuthSchema):
+    db = SessionLocal()
+
+    try:
+        google_data = id_token.verify_oauth2_token(
+            data.credential,
+            requests.Request(),
+            os.getenv("GOOGLE_CLIENT_ID")
+        )
+
+        email = google_data.get("email")
+        name = google_data.get("name")
+        picture = google_data.get("picture")
+
+        if not email:
+            return {"success": False, "message": "Google email not found"}
+
+        db_user = db.query(User).filter(User.email == email).first()
+
+        if not db_user:
+            db_user = User(
+                name=name or "Google User",
+                email=email,
+                hashed_password=hash_password("google_auth_user"),
+                profile_picture=picture,
+            )
+
+            db.add(db_user)
+            db.commit()
+            db.refresh(db_user)
+
+        token = create_access_token({
+            "user_id": db_user.id,
+            "email": db_user.email,
+        })
+
+        return {
+            "success": True,
+            "access_token": token,
+            "token_type": "bearer",
+            "user": {
+                "id": db_user.id,
+                "name": db_user.name,
+                "email": db_user.email,
+                "profile_picture": db_user.profile_picture,
+            },
+        }
+
+    except Exception:
+        return {"success": False, "message": "Google authentication failed"}
 
     finally:
         db.close()

@@ -1,6 +1,10 @@
 import { Plane, Mail, Lock, User, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import authImage from "../assets/travel-hero.png";
+import { GoogleLogin } from "@react-oauth/google";
+import axios from "axios";
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 export default function AuthScreen({
   authLoading,
@@ -9,6 +13,7 @@ export default function AuthScreen({
   authForm,
   setAuthForm,
   handleAuth,
+  setUser,
 }) {
   const [showPassword, setShowPassword] = useState(false);
 
@@ -140,10 +145,34 @@ export default function AuthScreen({
                   <div className="h-px flex-1 bg-slate-200 dark:bg-slate-700" />
                 </div>
 
-                <button className="w-full py-3 rounded-xl border border-slate-200 flex items-center justify-center gap-3 font-semibold hover:bg-slate-50 transition dark:border-slate-700 dark:hover:bg-slate-900 dark:text-white">
-                  <GoogleIcon />
-                  Continue with Google
-                </button>
+                <div className="w-full flex justify-center">
+                  <GoogleLogin
+                    onSuccess={async (credentialResponse) => {
+                      try {
+                        const res = await axios.post(`${API_URL}/google`, {
+                          credential: credentialResponse.credential,
+                        });
+
+                        if (res.data.success) {
+                          localStorage.setItem("token", res.data.access_token);
+                          localStorage.setItem(
+                            "user",
+                            JSON.stringify(res.data.user),
+                          );
+                          setUser(res.data.user);
+                        } else {
+                          alert(res.data.message || "Google login failed");
+                        }
+                      } catch (error) {
+                        console.error("Google login error:", error);
+                        alert("Google login failed");
+                      }
+                    }}
+                    onError={() => {
+                      alert("Google login failed");
+                    }}
+                  />
+                </div>
               </>
             )}
 

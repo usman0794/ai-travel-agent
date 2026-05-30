@@ -20,3 +20,6 @@ class TokenResponse(BaseModel):
 class ChangePasswordSchema(BaseModel):
     current_password: str
     new_password: str
+
+class GoogleAuthSchema(BaseModel):
+    credential: str
